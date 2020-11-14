@@ -1,5 +1,5 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:sound_on_fire/components/small_button.dart';
 import 'package:sound_on_fire/models/Track.dart';
 import 'package:sound_on_fire/util/constants.dart';
@@ -61,7 +61,7 @@ class BottomBar extends StatelessWidget {
                   Expanded(
                     child: SmallButton(
                       autoFocus: false,
-                      icon: Icon(audioPlayer.state != AudioPlayerState.PLAYING
+                      icon: Icon(audioPlayer.playing == false
                           ? Icons.play_arrow
                           : Icons.pause),
                       onClick: track != null ? playPause : null,

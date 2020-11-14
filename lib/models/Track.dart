@@ -15,7 +15,12 @@ class SearchResponse {
     if (json['collection'].length > 0) {
       for (var item in json['collection']) {
         Track track = Track.fromJson(item);
-        if (track != null) list.add(track);
+        if (track != null) {
+          list.add(track);
+        } else {
+          print(
+              "Corrupt Track: Title: ${item['title']}; ID: ${item['id']}; URI: ${item['uri']}");
+        }
       }
     }
     return SearchResponse(
@@ -91,7 +96,7 @@ class Track {
   factory Track.fromJson(Map<String, dynamic> json) {
     String transcodingURL = "";
     for (var transcoding in json['media']['transcodings']) {
-      if (transcoding["format"]["protocol"] == "progressive") {
+      if (transcoding["format"]["mime_type"] == "audio/mpeg") {
         transcodingURL = transcoding["url"];
         break;
       }
@@ -110,7 +115,7 @@ class Track {
         date: DateTime.parse(json['display_date']),
       );
     } else {
-      // This will ignore all track which do not consist of "protocol" type "progressive"
+      // This will ignore all track which do not consist of mp3 streams
       return null;
     }
   }

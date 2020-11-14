@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - "feat/*"
     paths:
       - ".github/**"
       - "android/**"

@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
@@ -89,22 +89,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void _initAudioPlayer() {
     audioPlayer = AudioPlayer();
-    audioPlayer.onAudioPositionChanged.listen((Duration d) {
-      setState(() {
-        currentAudioPosition = d;
-      });
-    });
-    audioPlayer.onPlayerCompletion.listen((data) {
-      print("Player Completion Event. Player error occured: $errorHasOccured");
-      // Check if  Player have had an error, if so ignore onCompletionEvent.
-      if (errorHasOccured) {
-        audioPlayer.release();
-        audioPlayer.seek(currentAudioPosition);
-        audioPlayer.play(playlist.first.streamUrl);
-        setState(() {
-          errorHasOccured = false;
-        });
-      } else {
+    audioPlayer.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        print(
+            "Player Completion Event. Player error occured: $errorHasOccured");
         setState(() {
           // playlist.removeFirst();
           playlist = ListQueue<Track>.from(playlist.skip(1));
@@ -115,15 +103,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         }
       }
     });
-    audioPlayer.onPlayerError.listen((event) {
-      print("Player Error Event: $event ; Position: $currentAudioPosition");
-      // playPause(forcePause: true);
-      // selectTrack(playlist.first);
-      // audioPlayer.seek(currentAudioPosition);
+    audioPlayer.positionStream.listen((Duration position) {
       setState(() {
-        errorHasOccured = true;
+        currentAudioPosition = position;
       });
-      // TODO: do sth when errors occur!
     });
   }
 
@@ -197,9 +180,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       currentAudioPosition = Duration(seconds: 0);
     });
     setPlaylist(track);
-    audioPlayer.play(track.streamUrl);
-    await FlutterWindowManager.addFlags(
-        FlutterWindowManager.FLAG_KEEP_SCREEN_ON);
+    try {
+      await audioPlayer.setUrl(track.streamUrl);
+      await audioPlayer.play();
+      await FlutterWindowManager.addFlags(
+          FlutterWindowManager.FLAG_KEEP_SCREEN_ON);
+    } catch (e) {
+      print("Error occured while setting streamUrl: $e");
+    }
   }
 
   void setPlaylist(Track track) {
@@ -252,14 +240,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   void playPause({bool forcePause = false}) async {
     if (playlist.isNotEmpty && playlist.first.streamUrl != null) {
-      if (audioPlayer.state == AudioPlayerState.PLAYING || forcePause) {
+      if (audioPlayer.playing || forcePause) {
         await audioPlayer.pause();
         await FlutterWindowManager.clearFlags(
             FlutterWindowManager.FLAG_KEEP_SCREEN_ON);
       } else {
-        await audioPlayer.play(playlist.first.streamUrl); //, stayAwake: true);
-        await FlutterWindowManager.addFlags(
-            FlutterWindowManager.FLAG_KEEP_SCREEN_ON);
+        if (audioPlayer.processingState == ProcessingState.ready) {
+          await audioPlayer.play();
+          await FlutterWindowManager.addFlags(
+              FlutterWindowManager.FLAG_KEEP_SCREEN_ON);
+        }
       }
     }
     setState(() {});
