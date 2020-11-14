@@ -40,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   ListQueue<Track> playlist = ListQueue<Track>();
   Duration currentAudioPosition;
   bool isAlphabeticalKeyboard = true;
-  bool errorHasOccured = false;
 
   ScrollController _scrollController;
 
@@ -91,10 +90,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     audioPlayer = AudioPlayer();
     audioPlayer.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
-        print(
-            "Player Completion Event. Player error occured: $errorHasOccured");
         setState(() {
-          // playlist.removeFirst();
           playlist = ListQueue<Track>.from(playlist.skip(1));
           currentAudioPosition = Duration(seconds: 0);
         });

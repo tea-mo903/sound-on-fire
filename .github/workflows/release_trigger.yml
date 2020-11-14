@@ -5,7 +5,7 @@ name: Release
 
 jobs:
   build:
-    name: Semantic-Release
+    name: Prepare-Version-Build-Release-Upload
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
