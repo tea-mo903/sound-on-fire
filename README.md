@@ -76,6 +76,35 @@ In case you are more interested in this feature you can go [here](REMOTE_CONTROL
 
 PRs Welcome!
 
+## Setting up dev
+
+Easiest way to setup your development environment is simply opening the project in VScode (Dart and Flutter extensions too). You will also need to download Flutter's SDK and add it to your PATH, you can do so in the following [link](https://flutter.dev/docs/get-started/install)
+.
+
+ After the installation process, you will need to set up a device or emulator; Follow the instructions in the following links depending on your choose.
+
+- [iOS](https://flutter.dev/docs/get-started/install)
+- [android](https://flutter.dev/docs/get-started/install/macos#android-setup)
+
+If you already have an emulator or device recogniced by VSCode, then you just need to launch the app by going to `main.dart` and pressing `F5`.
+
+### Troubleshouting 
+
+- Running `flutter doctor` might hint you some issues with missing dependencies. Such as:
+
+```
+[✗] Android toolchain - develop for Android devices
+    ✗ Unable to locate Android SDK.
+      Install Android Studio from: https://developer.android.com/studio/index.html
+      On first launch it will assist you in installing the Android SDK components.
+      (or visit https://flutter.dev/docs/get-started/install/macos#android-setup for detailed instructions).
+      If the Android SDK has been installed to a custom location, please use
+      `flutter config --android-sdk` to update to that location.
+```
+
+- If running `flutter create .` fails; check the folder project name and make it compliant with Dart [rules](https://dart.dev/tools/pub/pubspec#name) .
+
+
 ## Privacy
 
 Read [here](PRIVACY.md)
